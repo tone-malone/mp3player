@@ -39,33 +39,14 @@ SoftwareSerial softSerial(/*rx =*/11, /*tx =*/12);
 #define FPSerial Serial1
 #endif
 
-
-// Option 1: use any pins but a little slower
 Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, CS_PIN, DC_PIN, MOSI_PIN, SCLK_PIN, RST_PIN);  
 
-// Option 2: must use the hardware SPI pins 
-// (for UNO thats sclk = 13 and sid = 11) and pin 10 must be 
-// an output. This is much faster - also required if you want
-// to use the microSD card (see the image drawing example)
-//Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, &SPI, CS_PIN, DC_PIN, RST_PIN);
-
-float p = 3.1415926;
-
-
-
-
-
-
-const int NEXT_BUTTON = 7; // the number of the pushbutton pin
+const int NEXT_BUTTON = 7; // the pin number of the push button
 const int PREV_BUTTON = 8;
-const int VOLUP_BUTTON = 12; // 
-const int VOLDOWN_BUTTON = 13;
 
 int volumeLevel = 30;
-
-// Variables will change:
 int currentStateNEXT;    // the current reading from the input pin
-int currentStatePREV;    // the current reading from the input pin
+int currentStatePREV;    
 int currentStateVOLUP;
 int currentStateVOLDOWN;
 
@@ -90,111 +71,33 @@ void setup()
  uint16_t time = millis();    //time 
   tft.fillRect(0, 0, 128, 128, BLACK); //fill background black
   time = millis() - time;
-  
- // Serial.println(time, DEC);  //display time
-  
-
-
 
   Serial.println();
-  Serial.println(F("DFRobot DFPlayer Mini Demo"));
-  Serial.println(F("Initializing DFPlayer ... (May take 3~5 seconds)"));
+  Serial.println(F("MP3 Player"));
+  Serial.println(F("Initializing MP3 Player ..."));
 
   if (!myDFPlayer.begin(FPSerial, /*isACK = */true, /*doReset = */true)) {  //Use serial to communicate with mp3.
     Serial.println(F("Unable to begin:"));
     Serial.println(F("1.Please recheck the connection!"));
-    Serial.println(F("2.Please insert the SD card!"));
     while(true);
   }
-  Serial.println(F("DFPlayer Mini online."));
-  
-  //myDFPlayer.setTimeOut(500); //Set serial communictaion time out 500ms
+  Serial.println(F("MP3 Player Ready"));  
 
-  //----Set volume----
   myDFPlayer.volume(volumeLevel);  //Set volume value (0~30).
-  //myDFPlayer.volumeUp(); //Volume Up
-  //myDFPlayer.volumeDown(); //Volume Down
 
-  //----Set different EQ----
   myDFPlayer.EQ(DFPLAYER_EQ_NORMAL);
-//  myDFPlayer.EQ(DFPLAYER_EQ_POP);
-//  myDFPlayer.EQ(DFPLAYER_EQ_ROCK);
-//  myDFPlayer.EQ(DFPLAYER_EQ_JAZZ);
-//  myDFPlayer.EQ(DFPLAYER_EQ_CLASSIC);
-//  myDFPlayer.EQ(DFPLAYER_EQ_BASS);
 
-  //----Set device we use SD as default----
-//  myDFPlayer.outputDevice(DFPLAYER_DEVICE_U_DISK);
   myDFPlayer.outputDevice(DFPLAYER_DEVICE_SD);
-// myDFPlayer.outputDevice(DFPLAYER_DEVICE_AUX);
-//  myDFPlayer.outputDevice(DFPLAYER_DEVICE_SLEEP);
-//  myDFPlayer.outputDevice(DFPLAYER_DEVICE_FLASH);
 
-  //----Mp3 control----
-//  myDFPlayer.sleep();     //sleep
-//  myDFPlayer.reset();     //Reset the module
   myDFPlayer.enableDAC();  //Enable On-chip DAC
-//  myDFPlayer.disableDAC();  //Disable On-chip DAC
-//  myDFPlayer.outputSetting(true, 15); //output setting, enable the output and set the gain to 15
-
-  //----Mp3 play----
- // myDFPlayer.next();  //Play next mp3
-  //delay(1000);
- // myDFPlayer.previous();  //Play previous mp3
- // delay(1000);
- // myDFPlayer.play(1);  //Play the first mp3
- // delay(1000);
- // myDFPlayer.loop(1);  //Loop the first mp3
- // delay(1000);
- // myDFPlayer.pause();  //pause the mp3
- // delay(1000);
- // myDFPlayer.start();  //start the mp3 from the pause
-//  delay(1000);
- // myDFPlayer.playFolder(15, 4);  //play specific mp3 in SD:/15/004.mp3; Folder Name(1~99); File Name(1~255)
- // delay(1000);
- // myDFPlayer.enableLoopAll(); //loop all mp3 files.
- // delay(1000);
- // myDFPlayer.disableLoopAll(); //stop loop all mp3 files.
- // delay(1000);
- // myDFPlayer.playMp3Folder(4); //play specific mp3 in SD:/MP3/0004.mp3; File Name(0~65535)
- // delay(1000);
- // myDFPlayer.advertise(3); //advertise specific mp3 in SD:/ADVERT/0003.mp3; File Name(0~65535)
- // delay(1000);
- // myDFPlayer.stopAdvertise(); //stop advertise
- // delay(1000);
- // myDFPlayer.playLargeFolder(2, 999); //play specific mp3 in SD:/02/004.mp3; Folder Name(1~10); File Name(1~1000)
- // delay(1000);
- // myDFPlayer.loopFolder(5); //loop all mp3 files in folder SD:/05.
- // delay(1000);
- // myDFPlayer.randomAll(); //Random play all the mp3.
- // delay(1000);
- // myDFPlayer.enableLoop(); //enable loop.
- /// delay(1000);
- // myDFPlayer.disableLoop(); //disable loop.
- // delay(1000);
-
-  //----Read imformation----
- // Serial.println(myDFPlayer.readState()); //read mp3 state
-//  Serial.println(myDFPlayer.readVolume()); //read current volume
- // Serial.println(myDFPlayer.readEQ()); //read EQ setting
- // Serial.println(myDFPlayer.readFileCounts()); //read all file counts in SD card
- // Serial.println(myDFPlayer.readCurrentFileNumber()); //read current play file number
-//  Serial.println(myDFPlayer.readFileCountsInFolder(3)); //read file counts in folder SD:/03
-
-
 
 pinMode(NEXT_BUTTON, INPUT_PULLUP);
 pinMode(PREV_BUTTON, INPUT_PULLUP);
-pinMode(VOLUP_BUTTON, INPUT_PULLUP);
-pinMode(VOLDOWN_BUTTON, INPUT_PULLUP);
 pinMode (outputA,INPUT);
 pinMode (outputB,INPUT);
 
 
  aLastState = digitalRead(outputA);   
-
-
-
 
 }
 
@@ -221,58 +124,17 @@ tftDisplayVOL();
    aLastState = aState; // Updates the previous state of the outputA with the current state
  
 
-
 nextButton();
 prevButton();
-//volumeUpButton();
-//volumeDownButton();
 
   if (myDFPlayer.available()) {
     printDetail(myDFPlayer.readType(), myDFPlayer.read()); //Print the detail message from DFPlayer to handle different errors and states.
   }
 }
 
+//end of loop
 
-void volumeUpButton()
-{
-
- currentStateVOLUP = digitalRead(VOLUP_BUTTON);
-// check if the pushbutton is pressed. If it is, the buttonState is HIGH:
-  if(currentStateVOLUP == LOW)
-  {
-  volumeLevel += 1; 
-  myDFPlayer.volume(volumeLevel);
-  }
-  else
-  {  
-  exit;
-  }
-} 
-
-void volumeDownButton()
-{
-
- currentStateVOLDOWN = digitalRead(VOLDOWN_BUTTON);
-// check if the pushbutton is pressed. If it is, the buttonState is HIGH:
-  if(currentStateVOLDOWN == LOW)
-  {
-  volumeLevel -= 1; 
-  myDFPlayer.volume(volumeLevel);
-  }
-  else
-  {  
-  exit;
-  }
-} 
-
-
-
-
-
-
-
-
-
+//begin functions
 
 void nextButton()
 {
@@ -294,7 +156,6 @@ void nextButton()
   }
 } 
 
-  
 void prevButton()
 {
 currentStatePREV = digitalRead(PREV_BUTTON);
@@ -315,16 +176,6 @@ currentStatePREV = digitalRead(PREV_BUTTON);
   }
 }  
 
- //static unsigned long timer = millis();
-
-  //if (millis() - timer > 3000) {
- //   timer = millis();
- //   myDFPlayer.next();  //Play next mp3 every 3 second.
- // }
-
-
-
-
 void tftDisplayTime()
 {
  tft.fillScreen(BLACK);
@@ -337,17 +188,12 @@ void tftDisplayTime()
 
 void tftDisplayVOL()
 {
- //tft.fillScreen(BLACK);
  tft.setCursor(0, 115);
  tft.setTextColor(YELLOW);
  tft.print("VOLUME = ");
  tft.setTextColor(WHITE);
  tft.println(volumeLevel);
- //delay(1000);
 }
-
-
-
 
 void printDetail(uint8_t type, int value){
   switch (type) {
